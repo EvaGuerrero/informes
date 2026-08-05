@@ -14,7 +14,7 @@
     --series-1:       #757360; /* olivo — España */
     --series-2:       #1159af; /* azul de marca — Francia */
     --good:           #13612e;
-    --bad:            #b82105;
+    --bad:            #b5674f;
     --warn-bg:         #fbf1de;
     --warn-border:     #f5a524;
     --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
@@ -90,6 +90,8 @@
   .delta.bad { color: var(--bad); }
   .delta.flat { color: var(--text-muted); }
 
+  .chart-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .chart-row .chart-wrap { margin-bottom: 0; padding: 14px 10px 12px; }
   .chart-wrap { background: #ffffff; border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px 14px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(89,80,78,0.08); }
   .chart-title { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600; letter-spacing: 0.02em; text-align: center; }
   .delta-viz { display: flex; flex-direction: column; align-items: center; }
@@ -130,10 +132,8 @@
   }
   .callout strong { display: block; margin-bottom: 4px; font-family: var(--font-heading); font-size: 0.95rem; font-weight: 600; }
 
-  @media (max-width: 520px) {
-    .bars { gap: 12px; }
-    .bar { width: 32px; }
-    .bar-group { flex-basis: 70px; }
+  @media (max-width: 640px) {
+    .chart-row { grid-template-columns: 1fr; }
   }
 </style>
 
@@ -191,6 +191,7 @@
       </div>
     </div>
 
+    <div class="chart-row">
     <div class="chart-wrap">
       <div class="chart-title">Clics — mensual (España)</div>
       <div class="delta-viz">
@@ -229,6 +230,7 @@
         <div class="delta-values"><b>14,5</b> (jun 26) → <b>15,4</b> (jul 26)</div>
       </div>
     </div>
+    </div>
 
     <div class="comparison-heading">Comparativa interanual — Julio 2026 vs Julio 2025</div>
     <p class="comparison-note">Esta es la comparación que mejor muestra cómo está evolucionando el proyecto de verdad, sin el ruido de la temporada.</p>
@@ -266,6 +268,7 @@
       </div>
     </div>
 
+    <div class="chart-row">
     <div class="chart-wrap">
       <div class="chart-title">Clics — interanual (España)</div>
       <div class="delta-viz">
@@ -303,6 +306,7 @@
         </div>
         <div class="delta-values"><b>31,4</b> (jul 25) → <b>15,4</b> (jul 26)</div>
       </div>
+    </div>
     </div>
 
 <div class="table-wrap">
@@ -385,6 +389,7 @@
       </div>
     </div>
 
+    <div class="chart-row">
     <div class="chart-wrap">
       <div class="chart-title">Clics — mensual (Francia)</div>
       <div class="delta-viz">
@@ -423,6 +428,7 @@
         <div class="delta-values"><b>12,4</b> (jun 26) → <b>13,7</b> (jul 26)</div>
       </div>
     </div>
+    </div>
 
     <div class="comparison-heading">Comparativa interanual — Julio 2026 vs Julio 2025</div>
     <p class="comparison-note">Esta es la comparación que mejor muestra cómo está evolucionando el proyecto de verdad, sin el ruido de la temporada.</p>
@@ -460,6 +466,7 @@
       </div>
     </div>
 
+    <div class="chart-row">
     <div class="chart-wrap">
       <div class="chart-title">Clics — interanual (Francia)</div>
       <div class="delta-viz">
@@ -497,6 +504,7 @@
         </div>
         <div class="delta-values"><b>32,3</b> (jul 25) → <b>13,7</b> (jul 26)</div>
       </div>
+    </div>
     </div>
 
 <div class="table-wrap">
