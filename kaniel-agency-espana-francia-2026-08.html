@@ -1,0 +1,386 @@
+<title>Kaniel Agency — España vs Francia — Jul 2026</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #ffffff;
+    --page-plane:     #ffffff;
+    --text-primary:   #3f3937;
+    --text-secondary: #59504e;
+    --text-muted:     #9d9b8c;
+    --gridline:       #e8e5dd;
+    --baseline:       #ded9cc;
+    --border:         rgba(89,80,78,0.14);
+    --series-1:       #757360; /* olivo — España */
+    --series-2:       #1159af; /* azul de marca — Francia */
+    --good:           #13612e;
+    --bad:            #b82105;
+    --warn-bg:         #fbf1de;
+    --warn-border:     #f5a524;
+    --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --font-body: 'Questrial', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #26221f;
+      --page-plane:     #1a1715;
+      --text-primary:   #f3f0ea;
+      --text-secondary: #cbc6ba;
+      --text-muted:     #a39f8f;
+      --gridline:       #3a352f;
+      --baseline:       #4a443c;
+      --border:         rgba(255,255,255,0.12);
+      --series-1:       #b6b6a0;
+      --series-2:       #5a97e8;
+      --good:           #3f9e5e;
+      --bad:            #e2694a;
+      --warn-bg:         #362c17;
+      --warn-border:     #d99c2c;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #26221f;
+    --page-plane:     #1a1715;
+    --text-primary:   #f3f0ea;
+    --text-secondary: #cbc6ba;
+    --text-muted:     #a39f8f;
+    --gridline:       #3a352f;
+    --baseline:       #4a443c;
+    --border:         rgba(255,255,255,0.12);
+    --series-1:       #b6b6a0;
+    --series-2:       #5a97e8;
+    --good:           #3f9e5e;
+    --bad:            #e2694a;
+    --warn-bg:         #362c17;
+    --warn-border:     #d99c2c;
+  }
+
+  * { box-sizing: border-box; }
+  .viz-root {
+    font-family: var(--font-body);
+    background: var(--page-plane);
+    color: var(--text-primary);
+    padding: 40px 20px 64px;
+    max-width: 980px;
+    margin: 0 auto;
+    letter-spacing: 0.01em;
+  }
+  .logo { margin-bottom: 18px; }
+  .logo svg { display: block; }
+  .header { margin-bottom: 32px; }
+  .header h1 { font-family: var(--font-heading); font-weight: 600; font-size: 2rem; margin: 0 0 8px; color: var(--text-primary); }
+  .header p { color: var(--text-secondary); margin: 2px 0; font-size: 0.92rem; }
+  .badge {
+    display: inline-block; font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--series-1); background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 4px 12px; margin-top: 10px;
+  }
+
+  section.country { margin-top: 44px; }
+  .country-title {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-heading); font-weight: 600;
+    font-size: 1.5rem; margin-bottom: 4px;
+  }
+  .flag-dot { width: 12px; height: 12px; border-radius: 3px; }
+  .flag-dot.es { background: var(--series-1); }
+  .flag-dot.fr { background: var(--series-2); }
+  .country-sub { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px; }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .kpi-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(89,80,78,0.06);
+  }
+  .kpi-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px; }
+  .kpi-rows { display: flex; flex-direction: column; gap: 4px; }
+  .kpi-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.88rem; }
+  .kpi-row .period { color: var(--text-secondary); }
+  .kpi-row .value { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .kpi-row.current .value { font-size: 1.05rem; }
+  .delta { font-size: 0.72rem; font-variant-numeric: tabular-nums; margin-left: 6px; }
+  .delta.good { color: var(--good); }
+  .delta.bad { color: var(--bad); }
+  .delta.flat { color: var(--text-muted); }
+
+  .chart-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(89,80,78,0.06); }
+  .chart-title { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px; font-weight: 600; letter-spacing: 0.02em; }
+  .bars { display: flex; align-items: flex-end; gap: 22px; height: 120px; padding: 0 8px; }
+  .bar-group { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; }
+  .bar { width: 34px; border-radius: 4px 4px 0 0; background: var(--series-1); position: relative; }
+  .bar-val { font-size: 0.68rem; color: var(--text-secondary); margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+  .bar-label { font-size: 0.68rem; color: var(--text-muted); margin-top: 6px; text-align: center; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .table-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 16px; overflow-x: auto; box-shadow: 0 1px 3px rgba(89,80,78,0.06); }
+  .table-title { padding: 12px 16px 0; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.02em; }
+  th, td { text-align: left; padding: 8px 14px; border-bottom: 1px solid var(--gridline); white-space: nowrap; }
+  th { color: var(--text-muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.02em; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: none; }
+  td.name { white-space: normal; max-width: 320px; }
+
+  .callout {
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    line-height: 1.55;
+  }
+  .callout strong { display: block; margin-bottom: 4px; font-family: var(--font-heading); font-size: 0.95rem; font-weight: 600; }
+
+  .methodology {
+    margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--gridline);
+    font-size: 0.78rem; color: var(--text-muted); line-height: 1.6;
+  }
+  .methodology h3 { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px; }
+  @media (max-width: 520px) {
+    .bars { gap: 12px; }
+    .bar { width: 26px; }
+  }
+</style>
+
+<div class="viz-root">
+
+  <div class="logo">
+    <svg width="188" height="150" viewBox="0 0 600 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Eva Guerrero">
+      <circle cx="185" cy="240" r="150" fill="#f5efe8"/>
+      <text x="150" y="205" font-family="Georgia, 'Playfair Display', serif" font-size="76" fill="#ffffff" transform="translate(4,4)">eva</text>
+      <text x="150" y="205" font-family="Georgia, 'Playfair Display', serif" font-size="76" fill="#757360">eva</text>
+      <text x="150" y="275" font-family="Georgia, 'Playfair Display', serif" font-size="76" fill="#ffffff" transform="translate(4,4)">guerrero</text>
+      <text x="150" y="275" font-family="Georgia, 'Playfair Display', serif" font-size="76" fill="#757360">guerrero</text>
+    </svg>
+  </div>
+
+  <div class="header">
+    <h1>Kaniel Agency — Rendimiento SEO por mercado</h1>
+    <p>Propiedades Search Console: <strong>kaniel-agency.com/es/</strong> (España) y <strong>kaniel-agency.com/fr/</strong> (Francia)</p>
+    <p>Comparativa: Julio 2026 vs Junio 2026 (mes anterior) vs Julio 2025 (año anterior)</p>
+    <span class="badge">Datos obtenidos vía Search Console API · dataState: final</span>
+  </div>
+
+  <!-- ESPAÑA -->
+  <section class="country">
+    <div class="country-title"><span class="flag-dot es"></span>España</div>
+    <div class="country-sub">Propiedad kaniel-agency.com/es/ · ~200 clics/mes en el periodo analizado</div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Clics</div>
+        <div class="kpi-rows">
+          <div class="kpi-row"><span class="period">Jul 2025</span><span class="value">229</span></div>
+          <div class="kpi-row"><span class="period">Jun 2026</span><span class="value">219</span></div>
+          <div class="kpi-row current"><span class="period">Jul 2026</span><span class="value">203 <span class="delta bad">▼7.3% MoM</span></span></div>
+        </div>
+        <div class="delta bad">▼11.4% vs jul-25</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Impresiones</div>
+        <div class="kpi-rows">
+          <div class="kpi-row"><span class="period">Jul 2025</span><span class="value">36.597</span></div>
+          <div class="kpi-row"><span class="period">Jun 2026</span><span class="value">36.453</span></div>
+          <div class="kpi-row current"><span class="period">Jul 2026</span><span class="value">38.307 <span class="delta good">▲5.1% MoM</span></span></div>
+        </div>
+        <div class="delta good">▲4.7% vs jul-25</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">CTR</div>
+        <div class="kpi-rows">
+          <div class="kpi-row"><span class="period">Jul 2025</span><span class="value">0,63%</span></div>
+          <div class="kpi-row"><span class="period">Jun 2026</span><span class="value">0,60%</span></div>
+          <div class="kpi-row current"><span class="period">Jul 2026</span><span class="value">0,53% <span class="delta bad">▼0,07pp MoM</span></span></div>
+        </div>
+        <div class="delta bad">▼0,10pp vs jul-25</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Posición media</div>
+        <div class="kpi-rows">
+          <div class="kpi-row"><span class="period">Jul 2025</span><span class="value">31,4</span></div>
+          <div class="kpi-row"><span class="period">Jun 2026</span><span class="value">14,5</span></div>
+          <div class="kpi-row current"><span class="period">Jul 2026</span><span class="value">15,4 <span class="delta bad">▼0,9 MoM</span></span></div>
+        </div>
+        <div class="delta good">▲16,1 posiciones vs jul-25</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Clics — España</div>
+      <div class="bars">
+        <div class="bar-group"><div class="bar-val">229</div><div class="bar" style="height:100%; background:var(--baseline);"></div><div class="bar-label">Jul 2025</div></div>
+        <div class="bar-group"><div class="bar-val">219</div><div class="bar" style="height:95.6%; background:var(--baseline);"></div><div class="bar-label">Jun 2026</div></div>
+        <div class="bar-group"><div class="bar-val">203</div><div class="bar" style="height:88.6%;"></div><div class="bar-label">Jul 2026</div></div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Impresiones — España</div>
+      <div class="bars">
+        <div class="bar-group"><div class="bar-val">36.597</div><div class="bar" style="height:95.5%; background:var(--baseline);"></div><div class="bar-label">Jul 2025</div></div>
+        <div class="bar-group"><div class="bar-val">36.453</div><div class="bar" style="height:95.2%; background:var(--baseline);"></div><div class="bar-label">Jun 2026</div></div>
+        <div class="bar-group"><div class="bar-val">38.307</div><div class="bar" style="height:100%;"></div><div class="bar-label">Jul 2026</div></div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-title">Top consultas — España (clics por periodo)</div>
+      <table>
+        <thead><tr><th>Consulta</th><th class="num">Jul 25</th><th class="num">Jun 26</th><th class="num">Jul 26</th><th class="num">Impr. jul-26</th><th class="num">Pos. jul-26</th></tr></thead>
+        <tbody>
+          <tr><td class="name">kaniel agency</td><td class="num">9</td><td class="num">13</td><td class="num">11</td><td class="num">15</td><td class="num">1,3</td></tr>
+          <tr><td class="name">estilo moderno organico</td><td class="num">3</td><td class="num">0</td><td class="num">6</td><td class="num">69</td><td class="num">2,1</td></tr>
+          <tr><td class="name">estilo organico moderno</td><td class="num">6</td><td class="num">3</td><td class="num">5</td><td class="num">106</td><td class="num">2,1</td></tr>
+          <tr><td class="name">vent du sud online shop</td><td class="num">2</td><td class="num">0</td><td class="num">2</td><td class="num">25</td><td class="num">6,2</td></tr>
+          <tr><td class="name">mobiliario contract</td><td class="num">0</td><td class="num">0</td><td class="num">2</td><td class="num">537</td><td class="num">10,9</td></tr>
+          <tr><td class="name">kaniel</td><td class="num">0</td><td class="num">2</td><td class="num">2</td><td class="num">29</td><td class="num">4,7</td></tr>
+          <tr><td class="name">colores para negocios exitosos</td><td class="num">1</td><td class="num">3</td><td class="num">1</td><td class="num">220</td><td class="num">7,7</td></tr>
+          <tr><td class="name">biophilic design</td><td class="num">4</td><td class="num">2</td><td class="num">1</td><td class="num">63</td><td class="num">4,2</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-title">Top páginas — España (clics por periodo)</div>
+      <table>
+        <thead><tr><th>Página</th><th class="num">Jul 25</th><th class="num">Jun 26</th><th class="num">Jul 26</th><th class="num">Impr. jul-26</th><th class="num">Pos. jul-26</th></tr></thead>
+        <tbody>
+          <tr><td class="name">/es/colores-decoracion-negocios/</td><td class="num">0</td><td class="num">44</td><td class="num">39</td><td class="num">10.309</td><td class="num">6,7</td></tr>
+          <tr><td class="name">/es/5-claves-estilo-organico-moderno/</td><td class="num">45</td><td class="num">22</td><td class="num">29</td><td class="num">1.376</td><td class="num">10,5</td></tr>
+          <tr><td class="name">/es/ (home)</td><td class="num">18</td><td class="num">24</td><td class="num">20</td><td class="num">150</td><td class="num">7,7</td></tr>
+          <tr><td class="name">/es/glosario-de-interiorismo/</td><td class="num">0</td><td class="num">25</td><td class="num">19</td><td class="num">1.336</td><td class="num">5,6</td></tr>
+          <tr><td class="name">/es/catalogos-muebles-decoracion/</td><td class="num">23</td><td class="num">14</td><td class="num">14</td><td class="num">619</td><td class="num">11,9</td></tr>
+          <tr><td class="name">/es/marcas/les-jardins/</td><td class="num">0</td><td class="num">0</td><td class="num">7</td><td class="num">127</td><td class="num">7,8</td></tr>
+          <tr><td class="name">/es/que-es-mobiliario-contract/</td><td class="num">0</td><td class="num">0</td><td class="num">6</td><td class="num">2.539</td><td class="num">12,4</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="background:transparent; border-style:dashed;">
+      <strong>Lectura</strong>
+      Los clics bajan tanto MoM (-7,3%) como interanual (-11,4%), aunque las impresiones suben en ambas comparativas — la posición media empeoró ligeramente respecto a junio (14,5 → 15,4) y eso está recortando clics pese a más visibilidad. La gran historia sigue siendo la mejora estructural frente al año pasado (posición 31,4 → 15,4). <em>colores-decoracion-negocios</em> y <em>glosario-de-interiorismo</em> son páginas nuevas que ya arrastran mucho volumen (10.309 y 1.336 impresiones) — vale la pena reforzarlas. <em>que-es-mobiliario-contract</em> tiene 2.539 impresiones pero solo 6 clics: candidata clara a revisar título/meta description.
+    </div>
+  </section>
+
+  <!-- FRANCIA -->
+  <section class="country">
+    <div class="country-title"><span class="flag-dot fr"></span>Francia</div>
+    <div class="country-sub">Propiedad kaniel-agency.com/fr/ · ~55–65 clics/mes en el periodo analizado</div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Clics</div>
+        <div class="kpi-rows">
+          <div class="kpi-row"><span class="period">Jul 2025</span><span class="value">54</span></div>
+          <div class="kpi-row"><span class="period">Jun 2026</span><span class="value">65</span></div>
+          <div class="kpi-row current"><span class="period">Jul 2026</span><span class="value">59 <span class="delta bad">▼9.2% MoM</span></span></div>
+        </div>
+        <div class="delta good">▲9.3% vs jul-25</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Impresiones</div>
+        <div class="kpi-rows">
+          <div class="kpi-row"><span class="period">Jul 2025</span><span class="value">6.645</span></div>
+          <div class="kpi-row"><span class="period">Jun 2026</span><span class="value">4.886</span></div>
+          <div class="kpi-row current"><span class="period">Jul 2026</span><span class="value">4.933 <span class="delta good">▲1.0% MoM</span></span></div>
+        </div>
+        <div class="delta bad">▼25.8% vs jul-25</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">CTR</div>
+        <div class="kpi-rows">
+          <div class="kpi-row"><span class="period">Jul 2025</span><span class="value">0,81%</span></div>
+          <div class="kpi-row"><span class="period">Jun 2026</span><span class="value">1,33%</span></div>
+          <div class="kpi-row current"><span class="period">Jul 2026</span><span class="value">1,20% <span class="delta bad">▼0,13pp MoM</span></span></div>
+        </div>
+        <div class="delta good">▲0,38pp vs jul-25</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-label">Posición media</div>
+        <div class="kpi-rows">
+          <div class="kpi-row"><span class="period">Jul 2025</span><span class="value">32,3</span></div>
+          <div class="kpi-row"><span class="period">Jun 2026</span><span class="value">12,4</span></div>
+          <div class="kpi-row current"><span class="period">Jul 2026</span><span class="value">13,7 <span class="delta bad">▼1,3 MoM</span></span></div>
+        </div>
+        <div class="delta good">▲18,6 posiciones vs jul-25</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Clics — Francia</div>
+      <div class="bars">
+        <div class="bar-group"><div class="bar-val">54</div><div class="bar" style="height:83.1%; background:var(--baseline);"></div><div class="bar-label">Jul 2025</div></div>
+        <div class="bar-group"><div class="bar-val">65</div><div class="bar" style="height:100%; background:var(--baseline);"></div><div class="bar-label">Jun 2026</div></div>
+        <div class="bar-group"><div class="bar-val">59</div><div class="bar" style="height:90.8%; background:var(--series-2);"></div><div class="bar-label">Jul 2026</div></div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">Impresiones — Francia</div>
+      <div class="bars">
+        <div class="bar-group"><div class="bar-val">6.645</div><div class="bar" style="height:100%; background:var(--baseline);"></div><div class="bar-label">Jul 2025</div></div>
+        <div class="bar-group"><div class="bar-val">4.886</div><div class="bar" style="height:73.5%; background:var(--baseline);"></div><div class="bar-label">Jun 2026</div></div>
+        <div class="bar-group"><div class="bar-val">4.933</div><div class="bar" style="height:74.2%; background:var(--series-2);"></div><div class="bar-label">Jul 2026</div></div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-title">Top consultas — Francia (clics por periodo)</div>
+      <table>
+        <thead><tr><th>Consulta</th><th class="num">Jul 25</th><th class="num">Jun 26</th><th class="num">Jul 26</th><th class="num">Impr. jul-26</th><th class="num">Pos. jul-26</th></tr></thead>
+        <tbody>
+          <tr><td class="name">kaniel agency</td><td class="num">1</td><td class="num">7</td><td class="num">2</td><td class="num">3</td><td class="num">2,3</td></tr>
+          <tr><td class="name">frank lloyd wright</td><td class="num">0</td><td class="num">1</td><td class="num">2</td><td class="num">325</td><td class="num">10,8</td></tr>
+          <tr><td class="name">kodu</td><td class="num">0</td><td class="num">1</td><td class="num">2</td><td class="num">102</td><td class="num">7,3</td></tr>
+          <tr><td class="name">vp interiorismo</td><td class="num">1</td><td class="num">0</td><td class="num">1</td><td class="num">67</td><td class="num">6,9</td></tr>
+          <tr><td class="name">kodu home design</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">60</td><td class="num">8,7</td></tr>
+          <tr><td class="name">tapidisseny</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">75</td><td class="num">6,2</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-title">Top páginas — Francia (clics por periodo)</div>
+      <table>
+        <thead><tr><th>Página</th><th class="num">Jul 25</th><th class="num">Jun 26</th><th class="num">Jul 26</th><th class="num">Impr. jul-26</th><th class="num">Pos. jul-26</th></tr></thead>
+        <tbody>
+          <tr><td class="name">/fr/couleurs-decoration-commerce/</td><td class="num">0</td><td class="num">7</td><td class="num">14</td><td class="num">635</td><td class="num">6,3</td></tr>
+          <tr><td class="name">/fr/10-maisons-a-visiter-frank-lloyd/</td><td class="num">9</td><td class="num">10</td><td class="num">8</td><td class="num">1.044</td><td class="num">10,6</td></tr>
+          <tr><td class="name">/fr/marcas/kodu-home-design/</td><td class="num">7</td><td class="num">4</td><td class="num">5</td><td class="num">331</td><td class="num">8,1</td></tr>
+          <tr><td class="name">/fr/marcas/tapidisseny/</td><td class="num">2</td><td class="num">4</td><td class="num">4</td><td class="num">105</td><td class="num">6,8</td></tr>
+          <tr><td class="name">/fr/top-6-marques-europeennes-de-mobilier.../</td><td class="num">0</td><td class="num">4</td><td class="num">4</td><td class="num">307</td><td class="num">11,2</td></tr>
+          <tr><td class="name">/fr/ (home)</td><td class="num">3</td><td class="num">11</td><td class="num">2</td><td class="num">205</td><td class="num">9,0</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="background:transparent; border-style:dashed;">
+      <strong>Lectura</strong>
+      Francia se comporta de forma muy parecida a España: caída de clics MoM (-9,2%) coincidiendo con un ligero empeoramiento de posición (12,4 → 13,7), pero mejora interanual fuerte tanto en clics (+9,3%) como en posición (32,3 → 13,7). La página <em>couleurs-decoration-commerce</em> — la versión francesa de la página estrella española — está despegando igual de rápido (0 → 7 → 14 clics). Curiosamente Francia mejora su CTR interanual (+0,38pp) mientras España lo pierde (-0,10pp), así que el contenido en francés está convirtiendo mejor la visibilidad que gana.
+    </div>
+  </section>
+
+  <div class="methodology">
+    <h3>Metodología</h3>
+    <p>Los CSV exportados originalmente desde Search Console venían agregados como "últimos 3 meses vs mismo periodo año anterior", sin desglose mensual ni por propiedad, por lo que no permitían aislar julio 2026, junio 2026 y julio 2025 tal como se pedía. Para este informe se consultó directamente la API de Search Console sobre las dos propiedades reales de Kaniel Agency: <code>kaniel-agency.com/es/</code> (España) y <code>kaniel-agency.com/fr/</code> (Francia) — cada una como propiedad independiente, no como filtro de país dentro de una sola propiedad — con <code>dataState=final</code>. Los tres rangos usados: Jul-25 (2025-07-01 a 2025-07-31), Jun-26 (2026-06-01 a 2026-06-30), Jul-26 (2026-07-01 a 2026-07-31).</p>
+  </div>
+
+</div>
